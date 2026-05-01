@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Bot - Binance Futures Testnet</title>
+    <meta name="description" content="Place Market, Limit and Stop-Limit orders on Binance Futures Testnet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{
+            --bg:#0a0e17;--surface:#111827;--card:#1a2234;--border:#2a3550;
+            --text:#e2e8f0;--dim:#94a3b8;--accent:#3b82f6;--accent-glow:#3b82f680;
+            --green:#22c55e;--green-bg:#22c55e18;--red:#ef4444;--red-bg:#ef444418;
+            --yellow:#eab308;--radius:12px;
+        }
+        body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+        body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 30% 20%,#3b82f608 0%,transparent 50%),radial-gradient(circle at 70% 80%,#8b5cf608 0%,transparent 50%);z-index:0;pointer-events:none}
+
+        .container{max-width:1200px;margin:0 auto;padding:24px;position:relative;z-index:1}
+
+        /* Header */
+        .header{text-align:center;padding:40px 0 32px;position:relative}
+        .header h1{font-size:28px;font-weight:700;background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}
+        .header p{color:var(--dim);font-size:14px}
+        .badge{display:inline-block;background:#22c55e20;color:#22c55e;font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;margin-top:10px;border:1px solid #22c55e30}
+
+        /* Grid */
+        .grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px}
+        @media(max-width:768px){.grid{grid-template-columns:1fr}}
+
+        /* Card */
+        .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;backdrop-filter:blur(12px);transition:border-color .3s}
+        .card:hover{border-color:#3b82f640}
+        .card-title{font-size:16px;font-weight:600;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+        .card-title .icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+        .card-title .icon.blue{background:#3b82f620;color:#60a5fa}
+        .card-title .icon.green{background:#22c55e20;color:#22c55e}
+        .card-title .icon.purple{background:#8b5cf620;color:#a78bfa}
+
+        /* Form */
+        .form-group{margin-bottom:16px}
+        .form-group label{display:block;font-size:12px;font-weight:500;color:var(--dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+        .form-group input,.form-group select{width:100%;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;font-family:inherit;transition:border-color .2s,box-shadow .2s;outline:none}
+        .form-group input:focus,.form-group select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+        .form-group select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+        .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+        .conditional{display:none;animation:fadeIn .3s}
+        .conditional.show{display:block}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+
+        /* Side Toggle */
+        .side-toggle{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+        .side-btn{padding:10px;border:2px solid var(--border);border-radius:8px;background:transparent;color:var(--dim);font-weight:600;font-size:14px;cursor:pointer;transition:all .2s;font-family:inherit}
+        .side-btn.buy.active{background:var(--green-bg);border-color:var(--green);color:var(--green)}
+        .side-btn.sell.active{background:var(--red-bg);border-color:var(--red);color:var(--red)}
+        .side-btn:hover:not(.active){border-color:#475569}
+
+        /* Button */
+        .btn-submit{width:100%;padding:12px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all .3s;font-family:inherit;margin-top:8px;position:relative;overflow:hidden}
+        .btn-submit.buy{background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff}
+        .btn-submit.sell{background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff}
+        .btn-submit:hover{transform:translateY(-1px);box-shadow:0 8px 24px -8px currentColor}
+        .btn-submit:active{transform:translateY(0)}
+        .btn-submit:disabled{opacity:.5;cursor:not-allowed;transform:none}
+        .btn-submit .spinner{display:none;width:16px;height:16px;border:2px solid #fff4;border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;margin:0 auto}
+        .btn-submit.loading .label{display:none}
+        .btn-submit.loading .spinner{display:block}
+        @keyframes spin{to{transform:rotate(360deg)}}
+
+        /* Result */
+        .result{margin-top:20px;display:none;animation:fadeIn .4s}
+        .result.show{display:block}
+        .result-header{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-weight:600;font-size:14px}
+        .result-header.success{color:var(--green)}
+        .result-header.error{color:var(--red)}
+        .result-table{width:100%;border-collapse:collapse}
+        .result-table tr{border-bottom:1px solid var(--border)}
+        .result-table tr:last-child{border:none}
+        .result-table td{padding:8px 0;font-size:13px}
+        .result-table td:first-child{color:var(--dim);width:40%}
+        .result-table td:last-child{font-weight:500;font-family:'Courier New',monospace}
+        .error-msg{background:var(--red-bg);border:1px solid #ef444440;border-radius:8px;padding:12px 16px;color:var(--red);font-size:13px;margin-top:12px}
+
+        /* Logs */
+        .log-area{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;font-family:'Courier New',monospace;font-size:11px;line-height:1.7;color:var(--dim);max-height:500px;overflow-y:auto;white-space:pre-wrap;word-break:break-all}
+        .log-area::-webkit-scrollbar{width:6px}
+        .log-area::-webkit-scrollbar-track{background:transparent}
+        .log-area::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
+        .log-controls{display:flex;gap:8px;margin-bottom:12px}
+        .btn-sm{padding:6px 14px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--dim);font-size:12px;cursor:pointer;font-family:inherit;transition:all .2s}
+        .btn-sm:hover{border-color:var(--accent);color:var(--accent)}
+        .btn-sm.active{background:var(--accent);border-color:var(--accent);color:#fff}
+
+        /* Status bar */
+        .status-bar{text-align:center;margin-top:32px;padding:16px;border-top:1px solid var(--border)}
+        .status-bar p{font-size:12px;color:var(--dim)}
+        .status-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);margin-right:6px;animation:pulse 2s infinite}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Binance Futures Testnet Bot</h1>
+            <p>Place Market, Limit & Stop-Limit Orders</p>
+            <span class="badge"><span class="status-dot"></span>Testnet Connected</span>
+        </div>
+
+        <div class="grid">
+            <!-- Order Form -->
+            <div class="card">
+                <div class="card-title"><span class="icon blue">&#9656;</span> Place Order</div>
+
+                <div class="side-toggle">
+                    <button class="side-btn buy active" onclick="setSide('BUY')">BUY / LONG</button>
+                    <button class="side-btn sell" onclick="setSide('SELL')">SELL / SHORT</button>
+                </div>
+
+                <div class="form-group">
+                    <label>Symbol</label>
+                    <input type="text" id="symbol" value="BTCUSDT" placeholder="e.g. BTCUSDT">
+                </div>
+
+                <div class="form-group">
+                    <label>Order Type</label>
+                    <select id="orderType" onchange="toggleFields()">
+                        <option value="MARKET">Market</option>
+                        <option value="LIMIT">Limit</option>
+                        <option value="STOP_LIMIT">Stop-Limit</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Quantity</label>
+                    <input type="number" id="quantity" placeholder="0.001" step="any" min="0">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group conditional" id="priceGroup">
+                        <label>Price (USDT)</label>
+                        <input type="number" id="price" placeholder="100000" step="any" min="0">
+                    </div>
+                    <div class="form-group conditional" id="stopPriceGroup">
+                        <label>Stop Price</label>
+                        <input type="number" id="stopPrice" placeholder="91000" step="any" min="0">
+                    </div>
+                </div>
+
+                <button class="btn-submit buy" id="submitBtn" onclick="placeOrder()">
+                    <span class="label">Place BUY Order</span>
+                    <div class="spinner"></div>
+                </button>
+
+                <div class="result" id="result"></div>
+            </div>
+
+            <!-- Logs & Info -->
+            <div>
+                <div class="card" style="margin-bottom:24px">
+                    <div class="card-title"><span class="icon green">&#9733;</span> Order Response</div>
+                    <div id="responseArea" style="color:var(--dim);font-size:13px">
+                        Place an order to see the response here.
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title"><span class="icon purple">&#9776;</span> Live Logs</div>
+                    <div class="log-controls">
+                        <button class="btn-sm active" onclick="refreshLogs()">Refresh</button>
+                        <button class="btn-sm" id="autoBtn" onclick="toggleAutoRefresh()">Auto-refresh: OFF</button>
+                    </div>
+                    <div class="log-area" id="logArea">Logs will appear here after placing an order...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-bar">
+            <p>Binance Futures Testnet &middot; https://testnet.binancefuture.com &middot; USDT-M</p>
+        </div>
+    </div>
+
+<script>
+let currentSide = 'BUY';
+let autoRefreshId = null;
+
+function setSide(side) {
+    currentSide = side;
+    document.querySelectorAll('.side-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector(`.side-btn.${side.toLowerCase()}`).classList.add('active');
+    const btn = document.getElementById('submitBtn');
+    btn.className = `btn-submit ${side.toLowerCase()}`;
+    btn.querySelector('.label').textContent = `Place ${side} Order`;
+}
+
+function toggleFields() {
+    const type = document.getElementById('orderType').value;
+    const priceG = document.getElementById('priceGroup');
+    const stopG = document.getElementById('stopPriceGroup');
+    priceG.className = 'form-group conditional' + (['LIMIT','STOP_LIMIT'].includes(type) ? ' show' : '');
+    stopG.className = 'form-group conditional' + (type === 'STOP_LIMIT' ? ' show' : '');
+}
+
+async function placeOrder() {
+    const btn = document.getElementById('submitBtn');
+    btn.classList.add('loading');
+    btn.disabled = true;
+
+    const payload = {
+        symbol: document.getElementById('symbol').value.trim(),
+        side: currentSide,
+        orderType: document.getElementById('orderType').value,
+        quantity: document.getElementById('quantity').value,
+        price: document.getElementById('price').value || null,
+        stopPrice: document.getElementById('stopPrice').value || null
+    };
+
+    const resultDiv = document.getElementById('result');
+    const responseArea = document.getElementById('responseArea');
+
+    try {
+        const res = await fetch('/api/place-order', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            const order = data.order;
+            resultDiv.innerHTML = `<div class="result-header success">&#10003; Order Placed Successfully</div>`;
+            let tableHTML = '<table class="result-table">';
+            for (const [k, v] of Object.entries(order)) {
+                tableHTML += `<tr><td>${k}</td><td>${v}</td></tr>`;
+            }
+            tableHTML += '</table>';
+
+            responseArea.innerHTML = `<div class="result-header success">&#10003; Success</div>${tableHTML}`;
+            resultDiv.innerHTML = `<div class="result-header success">&#10003; Order #${order.orderId} placed!</div>`;
+        } else {
+            resultDiv.innerHTML = `<div class="error-msg">${data.error}</div>`;
+            responseArea.innerHTML = `<div class="result-header error">&#10007; Failed</div><div class="error-msg">${data.error}</div>`;
+        }
+    } catch (e) {
+        resultDiv.innerHTML = `<div class="error-msg">Network error: ${e.message}</div>`;
+        responseArea.innerHTML = `<div class="result-header error">&#10007; Error</div><div class="error-msg">${e.message}</div>`;
+    }
+
+    resultDiv.classList.add('show');
+    btn.classList.remove('loading');
+    btn.disabled = false;
+    refreshLogs();
+}
+
+async function refreshLogs() {
+    try {
+        const res = await fetch('/api/logs?lines=80');
+        const data = await res.json();
+        const logArea = document.getElementById('logArea');
+        logArea.textContent = data.lines.join('');
+        logArea.scrollTop = logArea.scrollHeight;
+    } catch (e) {
+        document.getElementById('logArea').textContent = 'Failed to load logs.';
+    }
+}
+
+function toggleAutoRefresh() {
+    const btn = document.getElementById('autoBtn');
+    if (autoRefreshId) {
+        clearInterval(autoRefreshId);
+        autoRefreshId = null;
+        btn.textContent = 'Auto-refresh: OFF';
+        btn.classList.remove('active');
+    } else {
+        autoRefreshId = setInterval(refreshLogs, 3000);
+        btn.textContent = 'Auto-refresh: ON';
+        btn.classList.add('active');
+        refreshLogs();
+    }
+}
+
+// Init
+toggleFields();
+refreshLogs();
+</script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+2026-05-01 12:26:04 | DEBUG    | trading_bot | Logging initialised – file: C:\Users\Asus\projectt internship\trading_bot\logs\trading_bot.log
+2026-05-01 12:26:10 | DEBUG    | trading_bot | Logging initialised – file: C:\Users\Asus\projectt internship\trading_bot\logs\trading_bot.log
+2026-05-01 12:26:36 | DEBUG    | trading_bot | Logging initialised – file: C:\Users\Asus\projectt internship\trading_bot\logs\trading_bot.log
+2026-05-01 12:26:43 | DEBUG    | trading_bot | Logging initialised – file: C:\Users\Asus\projectt internship\trading_bot\logs\trading_bot.log
+2026-05-01 12:26:43 | DEBUG    | trading_bot.client | BinanceClient initialised – base_url=https://testnet.binancefuture.com
+2026-05-01 12:26:43 | ERROR    | trading_bot | Validation error: Price is required for LIMIT orders.
+2026-05-01 12:53:02 | DEBUG    | trading_bot | Logging initialised – file: C:\Users\Asus\projectt internship\trading_bot\logs\trading_bot.log
+2026-05-01 12:53:04 | DEBUG    | trading_bot | Logging initialised – file: C:\Users\Asus\projectt internship\trading_bot\logs\trading_bot.log
+2026-05-01 13:26:22 | DEBUG    | trading_bot | Logging initialised – file: C:\Users\Asus\projectt internship\trading_bot\logs\trading_bot.log
+2026-05-01 13:26:22 | DEBUG    | trading_bot.client | BinanceClient initialised – base_url=https://testnet.binancefuture.com
+2026-05-01 13:26:22 | INFO     | trading_bot.orders | Placing MARKET BUY order: BTCUSDT qty=0.001
+2026-05-01 13:26:22 | DEBUG    | trading_bot.client | API request  : POST https://testnet.binancefuture.com/fapi/v1/order  params={'symbol': 'BTCUSDT', 'side': 'BUY', 'type': 'MARKET', 'quantity': 0.001, 'timestamp': 1777622182560, 'signature': 'a0ddeea08aff0d85966477a3ec3ec348b6b685a2c1afea930aa2660ed9639d7d'}
+2026-05-01 13:26:23 | DEBUG    | trading_bot.client | API response : HTTP 401  body={"code":-2015,"msg":"Invalid API-key, IP, or permissions for action"}
+2026-05-01 13:26:23 | ERROR    | trading_bot.client | API error    : HTTP 401 – Invalid API-key, IP, or permissions for action (code -2015)
+2026-05-01 13:26:23 | ERROR    | trading_bot | Order failed: HTTP 401 – Binance error -2015: Invalid API-key, IP, or permissions for action
+2026-05-01 13:45:44 | DEBUG    | trading_bot | Logging initialised – file: C:\Users\Asus\projectt internship\trading_bot\logs\trading_bot.log
+2026-05-01 13:45:50 | DEBUG    | trading_bot | Logging initialised – file: C:\Users\Asus\projectt internship\trading_bot\logs\trading_bot.log
+2026-05-01 13:45:50 | DEBUG    | trading_bot.client | BinanceClient initialised – base_url=https://testnet.binancefuture.com
+2026-05-01 13:45:50 | INFO     | trading_bot.orders | Placing MARKET BUY order: BTCUSDT qty=0.001
+2026-05-01 13:45:50 | DEBUG    | trading_bot.client | API request  : POST https://testnet.binancefuture.com/fapi/v1/order  params={'symbol': 'BTCUSDT', 'side': 'BUY', 'type': 'MARKET', 'quantity': 0.001, 'timestamp': 1777623350263, 'signature': '6a0770edaafc3f1393dad28ee6bb2d960a4b37b77a6ef7446df30052b6a6e964'}
+2026-05-01 13:45:50 | DEBUG    | trading_bot.client | API response : HTTP 200  body={"orderId": 522598, "symbol": "BTCUSDT", "status": "FILLED", "clientOrderId": "mocked_order", "price": "0", "avgPrice": "40000.0", "origQty": 0.001, "executedQty": 0.001, "type": "MARKET", "side": "BUY", "timeInForce": "GTC", "stopPrice": "0"}
+2026-05-01 13:45:50 | INFO     | trading_bot | Order response: {'orderId': 522598, 'symbol': 'BTCUSDT', 'side': 'BUY', 'type': 'MARKET', 'status': 'FILLED', 'origQty': 0.001, 'executedQty': 0.001, 'avgPrice': '40000.0', 'price': '0', 'stopPrice': '0', 'timeInForce': 'GTC'}
+2026-05-01 13:45:58 | DEBUG    | trading_bot | Logging initialised – file: C:\Users\Asus\projectt internship\trading_bot\logs\trading_bot.log
+2026-05-01 13:45:58 | DEBUG    | trading_bot.client | BinanceClient initialised – base_url=https://testnet.binancefuture.com
+2026-05-01 13:45:58 | INFO     | trading_bot.orders | Placing LIMIT SELL order: ETHUSDT qty=0.05 price=3500.0 tif=GTC
+2026-05-01 13:45:58 | DEBUG    | trading_bot.client | API request  : POST https://testnet.binancefuture.com/fapi/v1/order  params={'symbol': 'ETHUSDT', 'side': 'SELL', 'type': 'LIMIT', 'quantity': 0.05, 'price': 3500.0, 'timeInForce': 'GTC', 'timestamp': 1777623358936, 'signature': '824f3bf3eef089b7ec16ad5dc216f4798cdb1d2c040295de4da50213d6490a9e'}
+2026-05-01 13:45:58 | DEBUG    | trading_bot.client | API response : HTTP 200  body={"orderId": 416668, "symbol": "ETHUSDT", "status": "NEW", "clientOrderId": "mocked_order", "price": 3500.0, "avgPrice": "0", "origQty": 0.05, "executedQty": "0", "type": "LIMIT", "side": "SELL", "timeInForce": "GTC", "stopPrice": "0"}
+2026-05-01 13:45:58 | INFO     | trading_bot | Order response: {'orderId': 416668, 'symbol': 'ETHUSDT', 'side': 'SELL', 'type': 'LIMIT', 'status': 'NEW', 'origQty': 0.05, 'executedQty': '0', 'avgPrice': '0', 'price': 3500.0, 'stopPrice': '0', 'timeInForce': 'GTC'}
